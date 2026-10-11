@@ -7,4 +7,24 @@
     <RootNamespace>ST2_2026_Team_2_JobTracker</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="DesignPatterns\Factory\" />
+    <Folder Include="DesignPatterns\Strategy\" />
+    <Folder Include="Services\Interfaces\" />
+    <Folder Include="Views\Companies\" />
+    <Folder Include="Views\JobOffers\" />
+    <Folder Include="Views\Applications\" />
+    <Folder Include="Views\Dashboard\" />
+    <Folder Include="Views\AiMatch\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.12" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.12" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.12">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
 </Project>

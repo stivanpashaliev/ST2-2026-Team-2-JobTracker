@@ -1,9 +1,8 @@
-using Microsoft.AspNetCore.Mvc;
-using ST2_2026_Team_2_JobTracker.Models;
-using System.Diagnostics;
-
 namespace ST2_2026_Team_2_JobTracker.Controllers
 {
+    using Microsoft.AspNetCore.Mvc;
+    using System.Diagnostics;
+    using ST2_2026_Team_2_JobTracker.Models.ViewModels;
     public class HomeController : Controller
     {
         public IActionResult Index()

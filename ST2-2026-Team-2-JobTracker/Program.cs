@@ -1,5 +1,7 @@
 namespace ST2_2026_Team_2_JobTracker
 {
+    using Microsoft.EntityFrameworkCore;
+    using ST2_2026_Team_2_JobTracker.Data;
     public class Program
     {
         public static void Main(string[] args)
@@ -8,6 +10,12 @@ namespace ST2_2026_Team_2_JobTracker
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(connectionString));
 
             var app = builder.Build();
 
