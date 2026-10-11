@@ -2,6 +2,9 @@ namespace ST2_2026_Team_2_JobTracker
 {
     using Microsoft.EntityFrameworkCore;
     using ST2_2026_Team_2_JobTracker.Data;
+    using ST2_2026_Team_2_JobTracker.Services;
+    using ST2_2026_Team_2_JobTracker.Services.Interfaces;
+
     public class Program
     {
         public static void Main(string[] args)
@@ -16,6 +19,10 @@ namespace ST2_2026_Team_2_JobTracker
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
+
+            builder.Services.AddScoped<ICompanyService, CompanyService>();
+            builder.Services.AddScoped<IJobOfferService, JobOfferService>();
+            builder.Services.AddScoped<IApplicationService, ApplicationService>();
 
             var app = builder.Build();
 

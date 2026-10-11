@@ -1,0 +1,48 @@
+﻿@model ApplicationCreateViewModel
+
+@{
+    ViewData["Title"] = "Add Application";
+}
+
+<h2>Add Application</h2>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="JobOfferId" class="form-label">Job Offer</label>
+        <select asp-for="JobOfferId"
+                asp-items="Model.JobOffers"
+                class="form-select">
+            <option value="0">Select job offer</option>
+        </select>
+        <span asp-validation-for="JobOfferId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Status" class="form-label"></label>
+        <select asp-for="Status"
+                asp-items="Html.GetEnumSelectList<ST2_2026_Team_2_JobTracker.Models.Enums.ApplicationStatus>()"
+                class="form-select">
+        </select>
+        <span asp-validation-for="Status" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="AppliedAt" class="form-label"></label>
+        <input asp-for="AppliedAt" type="date" class="form-control" />
+        <span asp-validation-for="AppliedAt" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Notes" class="form-label"></label>
+        <textarea asp-for="Notes" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Notes" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Application</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

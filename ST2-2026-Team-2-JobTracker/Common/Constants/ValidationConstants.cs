@@ -22,7 +22,7 @@ public static class ValidationConstants
 
         public const int LocationMaxLength = 150;
 
-        public const double SalaryMinValue = 0;
+        public const double SalaryMinValue = 620;
         public const double SalaryMaxValue = 10000000;
 
         public const int SalaryPrecision = 12;

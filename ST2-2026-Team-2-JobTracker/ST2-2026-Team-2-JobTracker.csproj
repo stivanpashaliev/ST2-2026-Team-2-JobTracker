@@ -10,10 +10,6 @@
   <ItemGroup>
     <Folder Include="DesignPatterns\Factory\" />
     <Folder Include="DesignPatterns\Strategy\" />
-    <Folder Include="Services\Interfaces\" />
-    <Folder Include="Views\Companies\" />
-    <Folder Include="Views\JobOffers\" />
-    <Folder Include="Views\Applications\" />
     <Folder Include="Views\Dashboard\" />
     <Folder Include="Views\AiMatch\" />
   </ItemGroup>
