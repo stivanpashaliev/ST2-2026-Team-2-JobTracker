@@ -3,6 +3,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using ST2_2026_Team_2_JobTracker.Models.Entities;
+    using ST2_2026_Team_2_JobTracker.Models.Enums;
     using ST2_2026_Team_2_JobTracker.Models.ViewModels.JobOffers;
     using ST2_2026_Team_2_JobTracker.Services.Interfaces;
     public class JobOffersController : Controller
@@ -71,6 +72,39 @@
                 Value = c.Id.ToString(),
                 Text = c.Name
             }).ToList();
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Index(
+            string? title,
+            int? companyId,
+            string? location,
+            RemoteType? remoteType)
+        {
+            var jobOffers = await _jobOfferService.GetFilteredAsync(
+                title,
+                companyId,
+                location,
+                remoteType);
+
+            var companies = await _companyService.GetAllAsync();
+
+            var model = new JobOfferIndexViewModel
+            {
+                Title = title,
+                CompanyId = companyId,
+                Location = location,
+                RemoteType = remoteType,
+                JobOffers = jobOffers,
+                Companies = companies.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                }).ToList()
+            };
+
+            return View(model);
         }
     }
 }
