@@ -42,13 +42,13 @@ public class JobOfferService : IJobOfferService
             .AnyAsync(a => a.JobOfferId == id);
     }
 
-
-
     public async Task<(List<JobOffer> Items, int TotalCount)> GetFilteredAsync(
         string? title,
         int? companyId,
         string? location,
         RemoteType? remoteType,
+        decimal? minSalary,
+        decimal? maxSalary,
         int page,
         int pageSize)
     {
@@ -79,6 +79,22 @@ public class JobOfferService : IJobOfferService
         {
             query = query.Where(j =>
                 j.RemoteType == remoteType.Value);
+        }
+
+        // Filter by minimum salary
+        if (minSalary.HasValue)
+        {
+            query = query.Where(j =>
+                j.Salary.HasValue &&
+                j.Salary.Value >= minSalary.Value);
+        }
+
+        // Filter by maximum salary
+        if (maxSalary.HasValue)
+        {
+            query = query.Where(j =>
+                j.Salary.HasValue &&
+                j.Salary.Value <= maxSalary.Value);
         }
 
         var totalCount = await query.CountAsync();
