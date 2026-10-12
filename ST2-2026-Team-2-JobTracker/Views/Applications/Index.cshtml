@@ -1,0 +1,94 @@
+﻿
+@model ApplicationIndexViewModel
+
+@{
+    ViewData["Title"] = "Applications";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Applications</h2>
+
+    <a asp-action="Create" class="btn btn-primary">
+        Add Application
+    </a>
+</div>
+
+<form asp-action="Index" method="get" class="row g-3 mb-4">
+
+    <div class="col-md-4">
+        <label asp-for="JobTitle" class="form-label">Job Title</label>
+        <input asp-for="JobTitle"
+               class="form-control"
+               placeholder="Search by job title..." />
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="CompanyId" class="form-label">Company</label>
+        <select asp-for="CompanyId"
+                asp-items="Model.Companies"
+                class="form-select">
+            <option value="">All Companies</option>
+        </select>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="Status" class="form-label">Status</label>
+        <select asp-for="Status"
+                asp-items="Html.GetEnumSelectList<ST2_2026_Team_2_JobTracker.Models.Enums.ApplicationStatus>()"
+                class="form-select">
+            <option value="">All Statuses</option>
+        </select>
+    </div>
+
+    <div class="col-12 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+            Search
+        </button>
+
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            Clear
+        </a>
+    </div>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Job Title</th>
+                <th>Company</th>
+                <th>Status</th>
+                <th>Applied At</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model.Applications.Any())
+            {
+                @foreach (var application in Model.Applications)
+                {
+                    <tr>
+                        <td>@application.JobOffer.Title</td>
+                        <td>@application.JobOffer.Company.Name</td>
+                        <td>@application.Status</td>
+                        <td>
+                            @(application.AppliedAt.HasValue
+                                ? application.AppliedAt.Value.ToString("dd.MM.yyyy")
+                                : "-")
+                        </td>
+                        <td>@(application.Notes ?? "-")</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" class="text-center">
+                        No applications found.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -2,23 +2,29 @@
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
-    using ST2_2026_Team_2_JobTracker.Models.Enums;
-    using ST2_2026_Team_2_JobTracker.Services.Interfaces;
     using ST2_2026_Team_2_JobTracker.Models.Entities;
+    using ST2_2026_Team_2_JobTracker.Models.Enums;
     using ST2_2026_Team_2_JobTracker.Models.ViewModels.Applications;
+    using ST2_2026_Team_2_JobTracker.Services;
+    using ST2_2026_Team_2_JobTracker.Services.Interfaces;
 
     public class ApplicationsController : Controller
     {
         private readonly IApplicationService _applicationService;
         private readonly IJobOfferService _jobOfferService;
+        private readonly ICompanyService _companyService;
+
 
         public ApplicationsController(
             IApplicationService applicationService,
-            IJobOfferService jobOfferService)
+            IJobOfferService jobOfferService,
+            ICompanyService companyService)
         {
             _applicationService = applicationService;
             _jobOfferService = jobOfferService;
+            _companyService = companyService;
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Create()
@@ -96,6 +102,36 @@
             }
 
             model.JobOffers = availableOffers;
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Index(
+            string? jobTitle,
+            int? companyId,
+            ApplicationStatus? status)
+        {
+            var applications = await _applicationService.GetFilteredAsync(
+                jobTitle,
+                companyId,
+                status);
+
+            var companies = await _companyService.GetAllAsync();
+
+            var model = new ApplicationIndexViewModel
+            {
+                JobTitle = jobTitle,
+                CompanyId = companyId,
+                Status = status,
+                Applications = applications,
+                Companies = companies.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                }).ToList()
+            };
+
+            return View(model);
         }
     }
 }
