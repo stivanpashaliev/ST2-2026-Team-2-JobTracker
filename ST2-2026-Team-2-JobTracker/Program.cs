@@ -4,6 +4,7 @@ namespace ST2_2026_Team_2_JobTracker
     using ST2_2026_Team_2_JobTracker.Data;
     using ST2_2026_Team_2_JobTracker.Services;
     using ST2_2026_Team_2_JobTracker.Services.Interfaces;
+    using ST2_2026_Team_2_JobTracker.DesignPatterns.Singleton;
 
     public class Program
     {
@@ -23,6 +24,7 @@ namespace ST2_2026_Team_2_JobTracker
             builder.Services.AddScoped<ICompanyService, CompanyService>();
             builder.Services.AddScoped<IJobOfferService, JobOfferService>();
             builder.Services.AddScoped<IApplicationService, ApplicationService>();
+            builder.Services.AddSingleton(ApplicationSettings.Instance);
 
             var app = builder.Build();
 

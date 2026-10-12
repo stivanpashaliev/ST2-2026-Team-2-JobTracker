@@ -10,4 +10,10 @@ public class CompanyIndexViewModel
     public string? Location { get; set; }
 
     public List<Company> Companies { get; set; } = new();
+
+    public int CurrentPage { get; set; } = 1;
+
+    public int TotalPages { get; set; }
+
+    public int TotalCount { get; set; }
 }

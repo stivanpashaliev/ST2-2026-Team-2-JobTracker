@@ -7,5 +7,9 @@ public interface ICompanyService
     Task CreateAsync(Company company);
     Task<List<Company>> GetAllAsync();
     Task<bool> ExistsAsync(int id);
-    Task<List<Company>> GetFilteredAsync(string? name, string? location);
+    Task<(List<Company> Items, int TotalCount)> GetFilteredAsync(
+    string? name,
+    string? location,
+    int page,
+    int pageSize);
 }

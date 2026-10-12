@@ -19,4 +19,8 @@ public class JobOfferIndexViewModel
 
     public IEnumerable<SelectListItem> Companies { get; set; }
         = new List<SelectListItem>();
+
+    public int CurrentPage { get; set; } = 1;
+    public int TotalPages { get; set; }
+    public int TotalCount { get; set; }
 }

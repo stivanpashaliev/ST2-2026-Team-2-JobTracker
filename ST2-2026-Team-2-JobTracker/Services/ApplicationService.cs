@@ -23,15 +23,18 @@ public class ApplicationService : IApplicationService
     }
 
 
-    public async Task<List<Application>> GetFilteredAsync(
+
+    public async Task<(List<Application> Items, int TotalCount)> GetFilteredAsync(
         string? jobTitle,
         int? companyId,
-        ApplicationStatus? status)
+        ApplicationStatus? status,
+        int page,
+        int pageSize)
     {
         IQueryable<Application> query = _context.Applications
             .AsNoTracking()
             .Include(a => a.JobOffer)
-                .ThenInclude(j => j.Company);
+            .ThenInclude(j => j.Company);
 
         if (!string.IsNullOrWhiteSpace(jobTitle))
         {
@@ -51,9 +54,15 @@ public class ApplicationService : IApplicationService
                 a.Status == status.Value);
         }
 
-        return await query
+        var totalCount = await query.CountAsync();
+
+        var items = await query
             .OrderByDescending(a => a.AppliedAt)
-            .ThenByDescending(a => a.Id)
+            .ThenBy(a => a.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+
+        return (items, totalCount);
     }
 }

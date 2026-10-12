@@ -2,6 +2,7 @@
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
+    using ST2_2026_Team_2_JobTracker.DesignPatterns.Singleton;
     using ST2_2026_Team_2_JobTracker.Models.Entities;
     using ST2_2026_Team_2_JobTracker.Models.Enums;
     using ST2_2026_Team_2_JobTracker.Models.ViewModels.JobOffers;
@@ -10,13 +11,16 @@
     {
         private readonly IJobOfferService _jobOfferService;
         private readonly ICompanyService _companyService;
+        private readonly ApplicationSettings _settings;
 
         public JobOffersController(
             IJobOfferService jobOfferService,
-            ICompanyService companyService)
+            ICompanyService companyService,
+            ApplicationSettings settings)
         {
             _jobOfferService = jobOfferService;
             _companyService = companyService;
+            _settings = settings;
         }
 
         [HttpGet]
@@ -75,18 +79,44 @@
         }
 
 
+
         [HttpGet]
         public async Task<IActionResult> Index(
             string? title,
             int? companyId,
             string? location,
-            RemoteType? remoteType)
+            RemoteType? remoteType,
+            int page = 1)
         {
-            var jobOffers = await _jobOfferService.GetFilteredAsync(
-                title,
-                companyId,
-                location,
-                remoteType);
+            page = Math.Max(1, page);
+
+            int pageSize = _settings.DefaultPageSize;
+
+            var (jobOffers, totalCount) =
+                await _jobOfferService.GetFilteredAsync(
+                    title,
+                    companyId,
+                    location,
+                    remoteType,
+                    page,
+                    pageSize);
+
+            int totalPages = (int)Math.Ceiling(
+                (double)totalCount / pageSize);
+
+            if (totalPages > 0 && page > totalPages)
+            {
+                page = totalPages;
+
+                (jobOffers, totalCount) =
+                    await _jobOfferService.GetFilteredAsync(
+                        title,
+                        companyId,
+                        location,
+                        remoteType,
+                        page,
+                        pageSize);
+            }
 
             var companies = await _companyService.GetAllAsync();
 
@@ -97,6 +127,10 @@
                 Location = location,
                 RemoteType = remoteType,
                 JobOffers = jobOffers,
+                CurrentPage = page,
+                TotalPages = totalPages,
+                TotalCount = totalCount,
+
                 Companies = companies.Select(c => new SelectListItem
                 {
                     Value = c.Id.ToString(),
@@ -106,5 +140,6 @@
 
             return View(model);
         }
+
     }
 }

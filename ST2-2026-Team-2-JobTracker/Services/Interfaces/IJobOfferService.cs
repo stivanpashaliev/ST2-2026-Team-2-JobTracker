@@ -9,9 +9,11 @@ public interface IJobOfferService
     Task<List<JobOffer>> GetAllAsync();
     Task<bool> ExistsAsync(int id);
     Task<bool> HasApplicationAsync(int id);
-    Task<List<JobOffer>> GetFilteredAsync(
-    string? title,
-    int? companyId,
-    string? location,
-    RemoteType? remoteType);
+    Task<(List<JobOffer> Items, int TotalCount)> GetFilteredAsync(
+        string? title,
+        int? companyId,
+        string? location,
+        RemoteType? remoteType,
+        int page,
+        int pageSize);
 }

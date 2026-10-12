@@ -2,6 +2,7 @@
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
+    using ST2_2026_Team_2_JobTracker.DesignPatterns.Singleton;
     using ST2_2026_Team_2_JobTracker.Models.Entities;
     using ST2_2026_Team_2_JobTracker.Models.Enums;
     using ST2_2026_Team_2_JobTracker.Models.ViewModels.Applications;
@@ -13,16 +14,19 @@
         private readonly IApplicationService _applicationService;
         private readonly IJobOfferService _jobOfferService;
         private readonly ICompanyService _companyService;
+        private readonly ApplicationSettings _settings;
 
 
         public ApplicationsController(
             IApplicationService applicationService,
             IJobOfferService jobOfferService,
-            ICompanyService companyService)
+            ICompanyService companyService,
+            ApplicationSettings settings)
         {
             _applicationService = applicationService;
             _jobOfferService = jobOfferService;
             _companyService = companyService;
+            _settings = settings;
         }
 
 
@@ -105,16 +109,41 @@
         }
 
 
+
         [HttpGet]
         public async Task<IActionResult> Index(
             string? jobTitle,
             int? companyId,
-            ApplicationStatus? status)
+            ApplicationStatus? status,
+            int page = 1)
         {
-            var applications = await _applicationService.GetFilteredAsync(
-                jobTitle,
-                companyId,
-                status);
+            page = Math.Max(1, page);
+
+            int pageSize = _settings.DefaultPageSize;
+
+            var (applications, totalCount) =
+                await _applicationService.GetFilteredAsync(
+                    jobTitle,
+                    companyId,
+                    status,
+                    page,
+                    pageSize);
+
+            int totalPages = (int)Math.Ceiling(
+                (double)totalCount / pageSize);
+
+            if (totalPages > 0 && page > totalPages)
+            {
+                page = totalPages;
+
+                (applications, totalCount) =
+                    await _applicationService.GetFilteredAsync(
+                        jobTitle,
+                        companyId,
+                        status,
+                        page,
+                        pageSize);
+            }
 
             var companies = await _companyService.GetAllAsync();
 
@@ -124,6 +153,10 @@
                 CompanyId = companyId,
                 Status = status,
                 Applications = applications,
+                CurrentPage = page,
+                TotalPages = totalPages,
+                TotalCount = totalCount,
+
                 Companies = companies.Select(c => new SelectListItem
                 {
                     Value = c.Id.ToString(),

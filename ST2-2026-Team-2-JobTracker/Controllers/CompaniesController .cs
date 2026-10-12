@@ -1,6 +1,7 @@
 ﻿namespace ST2_2026_Team_2_JobTracker.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
+    using ST2_2026_Team_2_JobTracker.DesignPatterns.Singleton;
     using ST2_2026_Team_2_JobTracker.Models.Entities;
     using ST2_2026_Team_2_JobTracker.Models.ViewModels;
     using ST2_2026_Team_2_JobTracker.Models.ViewModels.Companies;
@@ -8,11 +9,17 @@
     public class CompaniesController : Controller
     {
         private readonly ICompanyService _companyService;
+        private readonly ApplicationSettings _settings;
 
-        public CompaniesController(ICompanyService companyService)
+
+        public CompaniesController(
+            ICompanyService companyService,
+            ApplicationSettings settings)
         {
             _companyService = companyService;
+            _settings = settings;
         }
+
 
         [HttpGet]
         public IActionResult Create()
@@ -44,23 +51,53 @@
         }
 
 
+
         [HttpGet]
         public async Task<IActionResult> Index(
             string? name,
-            string? location)
+            string? location,
+            int page = 1)
         {
-            var companies = await _companyService.GetFilteredAsync(
-                name,
-                location);
+            page = Math.Max(1, page);
+
+            int pageSize = _settings.DefaultPageSize;
+
+            var (companies, totalCount) =
+                await _companyService.GetFilteredAsync(
+                    name,
+                    location,
+                    page,
+                    pageSize);
+
+            int totalPages = (int)Math.Ceiling(
+                (double)totalCount / pageSize);
+
+            if (totalPages > 0 && page > totalPages)
+            {
+                page = totalPages;
+
+                (companies, totalCount) =
+                    await _companyService.GetFilteredAsync(
+                        name,
+                        location,
+                        page,
+                        pageSize);
+            }
 
             var model = new CompanyIndexViewModel
             {
                 Name = name,
                 Location = location,
-                Companies = companies
+                Companies = companies,
+                CurrentPage = page,
+                TotalPages = totalPages,
+                TotalCount = totalCount
             };
+
+            ViewData["ApplicationName"] = _settings.ApplicationName;
 
             return View(model);
         }
+
     }
 }

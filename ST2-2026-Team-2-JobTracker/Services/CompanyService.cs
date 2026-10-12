@@ -36,16 +36,20 @@ public class CompanyService : ICompanyService
     }
 
 
-    public async Task<List<Company>> GetFilteredAsync(
+
+    public async Task<(List<Company> Items, int TotalCount)> GetFilteredAsync(
         string? name,
-        string? location)
+        string? location,
+        int page,
+        int pageSize)
     {
         IQueryable<Company> query = _context.Companies
             .AsNoTracking();
 
         if (!string.IsNullOrWhiteSpace(name))
         {
-            query = query.Where(c => c.Name.Contains(name.Trim()));
+            query = query.Where(c =>
+                c.Name.Contains(name.Trim()));
         }
 
         if (!string.IsNullOrWhiteSpace(location))
@@ -55,8 +59,16 @@ public class CompanyService : ICompanyService
                 c.Location.Contains(location.Trim()));
         }
 
-        return await query
+        var totalCount = await query.CountAsync();
+
+        var items = await query
             .OrderBy(c => c.Name)
+            .ThenBy(c => c.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+
+        return (items, totalCount);
     }
+
 }

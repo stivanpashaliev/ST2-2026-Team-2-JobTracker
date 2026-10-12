@@ -6,8 +6,10 @@ namespace ST2_2026_Team_2_JobTracker.Services.Interfaces;
 public interface IApplicationService
 {
     Task CreateAsync(Application application);
-    Task<List<Application>> GetFilteredAsync(
-    string? jobTitle,
-    int? companyId,
-    ApplicationStatus? status);
+    Task<(List<Application> Items, int TotalCount)> GetFilteredAsync(
+        string? jobTitle,
+        int? companyId,
+        ApplicationStatus? status,
+        int page,
+        int pageSize);
 }

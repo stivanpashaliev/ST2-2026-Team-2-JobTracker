@@ -43,11 +43,14 @@ public class JobOfferService : IJobOfferService
     }
 
 
-    public async Task<List<JobOffer>> GetFilteredAsync(
+
+    public async Task<(List<JobOffer> Items, int TotalCount)> GetFilteredAsync(
         string? title,
         int? companyId,
         string? location,
-        RemoteType? remoteType)
+        RemoteType? remoteType,
+        int page,
+        int pageSize)
     {
         IQueryable<JobOffer> query = _context.JobOffers
             .AsNoTracking()
@@ -78,8 +81,15 @@ public class JobOfferService : IJobOfferService
                 j.RemoteType == remoteType.Value);
         }
 
-        return await query
+        var totalCount = await query.CountAsync();
+
+        var items = await query
             .OrderByDescending(j => j.CreatedAt)
+            .ThenBy(j => j.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+
+        return (items, totalCount);
     }
 }
