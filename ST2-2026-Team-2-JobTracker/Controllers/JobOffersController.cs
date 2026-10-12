@@ -81,65 +81,72 @@
 
 
         [HttpGet]
-        public async Task<IActionResult> Index(
-            string? title,
-            int? companyId,
-            string? location,
-            RemoteType? remoteType,
-            int page = 1)
+public async Task<IActionResult> Index(
+    string? title,
+    int? companyId,
+    string? location,
+    RemoteType? remoteType,
+    decimal? minSalary,
+    decimal? maxSalary,
+    int page = 1)
+{
+    page = Math.Max(1, page);
+
+    int pageSize = _settings.DefaultPageSize;
+
+    var (jobOffers, totalCount) =
+        await _jobOfferService.GetFilteredAsync(
+            title,
+            companyId,
+            location,
+            remoteType,
+            minSalary,
+            maxSalary,
+            page,
+            pageSize);
+
+    int totalPages = (int)Math.Ceiling(
+        (double)totalCount / pageSize);
+
+    if (totalPages > 0 && page > totalPages)
+    {
+        page = totalPages;
+
+        (jobOffers, totalCount) =
+            await _jobOfferService.GetFilteredAsync(
+                title,
+                companyId,
+                location,
+                remoteType,
+                minSalary,
+                maxSalary,
+                page,
+                pageSize);
+    }
+
+    var companies = await _companyService.GetAllAsync();
+
+    var model = new JobOfferIndexViewModel
+    {
+        Title = title,
+        CompanyId = companyId,
+        Location = location,
+        RemoteType = remoteType,
+        MinSalary = minSalary,
+        MaxSalary = maxSalary,
+        JobOffers = jobOffers,
+        CurrentPage = page,
+        TotalPages = totalPages,
+        TotalCount = totalCount,
+
+        Companies = companies.Select(c => new SelectListItem
         {
-            page = Math.Max(1, page);
+            Value = c.Id.ToString(),
+            Text = c.Name
+        }).ToList()
+    };
 
-            int pageSize = _settings.DefaultPageSize;
-
-            var (jobOffers, totalCount) =
-                await _jobOfferService.GetFilteredAsync(
-                    title,
-                    companyId,
-                    location,
-                    remoteType,
-                    page,
-                    pageSize);
-
-            int totalPages = (int)Math.Ceiling(
-                (double)totalCount / pageSize);
-
-            if (totalPages > 0 && page > totalPages)
-            {
-                page = totalPages;
-
-                (jobOffers, totalCount) =
-                    await _jobOfferService.GetFilteredAsync(
-                        title,
-                        companyId,
-                        location,
-                        remoteType,
-                        page,
-                        pageSize);
-            }
-
-            var companies = await _companyService.GetAllAsync();
-
-            var model = new JobOfferIndexViewModel
-            {
-                Title = title,
-                CompanyId = companyId,
-                Location = location,
-                RemoteType = remoteType,
-                JobOffers = jobOffers,
-                CurrentPage = page,
-                TotalPages = totalPages,
-                TotalCount = totalCount,
-
-                Companies = companies.Select(c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = c.Name
-                }).ToList()
-            };
-
-            return View(model);
-        }
-
+    return View(model);
+      }
     }
 }
