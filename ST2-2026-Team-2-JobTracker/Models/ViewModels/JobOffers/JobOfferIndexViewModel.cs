@@ -15,6 +15,10 @@ public class JobOfferIndexViewModel
 
     public RemoteType? RemoteType { get; set; }
 
+    public decimal? MinSalary { get; set; }
+
+    public decimal? MaxSalary { get; set; }
+
     public List<JobOffer> JobOffers { get; set; } = new();
 
     public IEnumerable<SelectListItem> Companies { get; set; }
