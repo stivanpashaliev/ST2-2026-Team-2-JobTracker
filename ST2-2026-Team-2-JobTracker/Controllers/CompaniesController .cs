@@ -3,6 +3,7 @@
     using Microsoft.AspNetCore.Mvc;
     using ST2_2026_Team_2_JobTracker.Models.Entities;
     using ST2_2026_Team_2_JobTracker.Models.ViewModels;
+    using ST2_2026_Team_2_JobTracker.Models.ViewModels.Companies;
     using ST2_2026_Team_2_JobTracker.Services.Interfaces;
     public class CompaniesController : Controller
     {
@@ -40,6 +41,26 @@
             TempData["SuccessMessage"] = "Company created successfully.";
 
             return RedirectToAction("Index", "Home");
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Index(
+            string? name,
+            string? location)
+        {
+            var companies = await _companyService.GetFilteredAsync(
+                name,
+                location);
+
+            var model = new CompanyIndexViewModel
+            {
+                Name = name,
+                Location = location,
+                Companies = companies
+            };
+
+            return View(model);
         }
     }
 }

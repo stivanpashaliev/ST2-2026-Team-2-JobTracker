@@ -34,4 +34,29 @@ public class CompanyService : ICompanyService
         return await _context.Companies
             .AnyAsync(c => c.Id == id);
     }
+
+
+    public async Task<List<Company>> GetFilteredAsync(
+        string? name,
+        string? location)
+    {
+        IQueryable<Company> query = _context.Companies
+            .AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            query = query.Where(c => c.Name.Contains(name.Trim()));
+        }
+
+        if (!string.IsNullOrWhiteSpace(location))
+        {
+            query = query.Where(c =>
+                c.Location != null &&
+                c.Location.Contains(location.Trim()));
+        }
+
+        return await query
+            .OrderBy(c => c.Name)
+            .ToListAsync();
+    }
 }

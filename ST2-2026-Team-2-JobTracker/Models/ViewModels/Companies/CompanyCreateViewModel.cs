@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ST2_2026_Team_2_JobTracker.Common.Constants;
 
-namespace ST2_2026_Team_2_JobTracker.Models.ViewModels;
+namespace ST2_2026_Team_2_JobTracker.Models.ViewModels.Companies;
 
 public class CompanyCreateViewModel
 {

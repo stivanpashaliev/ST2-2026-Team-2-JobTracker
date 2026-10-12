@@ -3,9 +3,10 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using ST2_2026_Team_2_JobTracker.Models.Enums;
-    using ST2_2026_Team_2_JobTracker.Models.ViewModels;
     using ST2_2026_Team_2_JobTracker.Services.Interfaces;
     using ST2_2026_Team_2_JobTracker.Models.Entities;
+    using ST2_2026_Team_2_JobTracker.Models.ViewModels.Applications;
+
     public class ApplicationsController : Controller
     {
         private readonly IApplicationService _applicationService;

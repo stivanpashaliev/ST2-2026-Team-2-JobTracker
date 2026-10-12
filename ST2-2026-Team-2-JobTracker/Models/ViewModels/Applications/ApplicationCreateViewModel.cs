@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using ST2_2026_Team_2_JobTracker.Common.Constants;
 using ST2_2026_Team_2_JobTracker.Models.Enums;
 
-namespace ST2_2026_Team_2_JobTracker.Models.ViewModels;
+namespace ST2_2026_Team_2_JobTracker.Models.ViewModels.Applications;
 
 
 public class ApplicationCreateViewModel

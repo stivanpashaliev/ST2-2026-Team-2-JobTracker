@@ -3,7 +3,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using ST2_2026_Team_2_JobTracker.Models.Entities;
-    using ST2_2026_Team_2_JobTracker.Models.ViewModels;
+    using ST2_2026_Team_2_JobTracker.Models.ViewModels.JobOffers;
     using ST2_2026_Team_2_JobTracker.Services.Interfaces;
     public class JobOffersController : Controller
     {
