@@ -39,3 +39,205 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+.welcome-hero {
+    position: relative;
+    display: flex;
+    min-height: 340px;
+    align-items: center;
+    overflow: hidden;
+    padding: clamp(2rem, 6vw, 4.5rem);
+    border-radius: 1.25rem;
+    background: linear-gradient(115deg, #142b4a 0%, #1c4264 64%, #276b76 100%);
+    color: #fff;
+}
+
+.welcome-hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 620px;
+}
+
+.welcome-eyebrow {
+    margin-bottom: 0.75rem;
+    color: #80d4c3;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+}
+
+.welcome-hero h1 {
+    margin-bottom: 1rem;
+    font-size: clamp(2.25rem, 5vw, 3.5rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.08;
+}
+
+.welcome-intro {
+    max-width: 510px;
+    margin-bottom: 1.75rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.05rem;
+    line-height: 1.65;
+}
+
+.welcome-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.5rem;
+}
+
+.welcome-actions .btn {
+    border: 0;
+    color: #17334e;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.welcome-secondary-link {
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.welcome-secondary-link:hover,
+.welcome-secondary-link:focus-visible {
+    color: #a9e9dc;
+}
+
+.welcome-hero-mark {
+    position: absolute;
+    top: 50%;
+    right: 8%;
+    display: flex;
+    width: 220px;
+    align-items: center;
+    gap: 0.4rem;
+    opacity: 0.24;
+    transform: translateY(-50%) rotate(-35deg);
+}
+
+.welcome-mark-line {
+    height: 2px;
+    flex: 1;
+    background: #fff;
+}
+
+.welcome-mark-dot {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+}
+
+.welcome-workflow {
+    padding: 3.25rem 0 1.5rem;
+}
+
+.welcome-section-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.welcome-section-heading .welcome-eyebrow {
+    margin-bottom: 0.4rem;
+    color: #287a75;
+}
+
+.welcome-section-heading h2 {
+    margin: 0;
+    color: #182d43;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+}
+
+.welcome-section-heading > p {
+    max-width: 340px;
+    margin: 0 0 0.15rem;
+    color: #637386;
+}
+
+.welcome-step-card {
+    height: 100%;
+    padding: 1.5rem;
+    border: 1px solid #e5ebf0;
+    border-radius: 0.9rem;
+    background: #fff;
+    transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.welcome-step-card:hover {
+    border-color: #c9e1dc;
+    box-shadow: 0 0.75rem 1.75rem rgba(24, 45, 67, 0.08);
+    transform: translateY(-3px);
+}
+
+.welcome-step-number {
+    display: inline-flex;
+    width: 2.5rem;
+    height: 2.5rem;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.1rem;
+    border-radius: 50%;
+    background: #e8f5f1;
+    color: #287a75;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.welcome-step-card h3 {
+    margin-bottom: 0.5rem;
+    color: #182d43;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.welcome-step-card p {
+    min-height: 3rem;
+    margin-bottom: 1rem;
+    color: #637386;
+    line-height: 1.55;
+}
+
+.welcome-step-card a {
+    color: #287a75;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.welcome-step-card a:hover,
+.welcome-step-card a:focus-visible {
+    color: #185953;
+    text-decoration: underline;
+}
+
+@media (max-width: 767.98px) {
+    .welcome-hero {
+        min-height: 0;
+        padding: 2.25rem 1.5rem;
+    }
+
+    .welcome-hero-mark {
+        top: 1.5rem;
+        right: -4rem;
+        width: 150px;
+        transform: rotate(-35deg);
+    }
+
+    .welcome-section-heading {
+        align-items: start;
+        flex-direction: column;
+    }
+
+    .welcome-step-card p {
+        min-height: 0;
+    }
+}

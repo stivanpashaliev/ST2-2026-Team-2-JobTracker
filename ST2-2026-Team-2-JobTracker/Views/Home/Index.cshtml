@@ -1,8 +1,60 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Welcome";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<section class="welcome-hero">
+    <div class="welcome-hero-content">
+        <p class="welcome-eyebrow">YOUR CAREER SEARCH, ORGANIZED</p>
+        <h1>Make your next move<br />with confidence.</h1>
+        <p class="welcome-intro">
+            Keep the companies you’re interested in, the opportunities you find,
+            and the applications you send all in one place.
+        </p>
+        <div class="welcome-actions">
+            <a class="btn btn-light btn-lg" asp-controller="JobOffers" asp-action="Index">Explore job offers</a>
+            <a class="welcome-secondary-link" asp-controller="Applications" asp-action="Index">View your applications <span aria-hidden="true">&rarr;</span></a>
+        </div>
+    </div>
+    <div class="welcome-hero-mark" aria-hidden="true">
+        <span class="welcome-mark-line"></span>
+        <span class="welcome-mark-dot"></span>
+        <span class="welcome-mark-line"></span>
+    </section>
+
+<section class="welcome-workflow" aria-labelledby="workflow-heading">
+    <div class="welcome-section-heading">
+        <div>
+            <p class="welcome-eyebrow">A CLEARER WAY FORWARD</p>
+            <h2 id="workflow-heading">Your search, step by step</h2>
+        </div>
+        <p>Everything you need to stay on top of your job search.</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <article class="welcome-step-card">
+                <span class="welcome-step-number">01</span>
+                <h3>Save companies</h3>
+                <p>Keep track of the organizations you’d like to work for.</p>
+                <a asp-controller="Companies" asp-action="Index">Browse companies <span aria-hidden="true">&rarr;</span></a>
+            </article>
+        </div>
+        <div class="col-md-4">
+            <article class="welcome-step-card">
+                <span class="welcome-step-number">02</span>
+                <h3>Find opportunities</h3>
+                <p>Explore job offers and keep promising roles close at hand.</p>
+                <a asp-controller="JobOffers" asp-action="Index">View job offers <span aria-hidden="true">&rarr;</span></a>
+            </article>
+        </div>
+        <div class="col-md-4">
+            <article class="welcome-step-card">
+                <span class="welcome-step-number">03</span>
+                <h3>Track applications</h3>
+                <p>See the applications you’ve submitted in one convenient place.</p>
+                <a asp-controller="Applications" asp-action="Index">View applications <span aria-hidden="true">&rarr;</span></a>
+            </article>
+        </div>
+    </div>
 </div>
+</section>
