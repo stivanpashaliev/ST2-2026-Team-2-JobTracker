@@ -1,4 +1,4 @@
-﻿
+
 using Microsoft.EntityFrameworkCore;
 using ST2_2026_Team_2_JobTracker.Data;
 using ST2_2026_Team_2_JobTracker.Models.Entities;
@@ -64,5 +64,43 @@ public class ApplicationService : IApplicationService
             .ToListAsync();
 
         return (items, totalCount);
+    }
+
+    public async Task<Application?> GetByIdAsync(int id)
+    {
+        return await _context.Applications
+            .AsNoTracking()
+            .Include(a => a.JobOffer)
+            .SingleOrDefaultAsync(item => item.Id == id);
+    }
+
+    public async Task<bool> UpdateAsync(Application application)
+    {
+        var existing = await _context.Applications.FindAsync(application.Id);
+        if (existing == null)
+        {
+            return false;
+        }
+
+        existing.JobOfferId = application.JobOfferId;
+        existing.Status = application.Status;
+        existing.AppliedAt = application.AppliedAt;
+        existing.Notes = application.Notes;
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<DeleteResult> DeleteAsync(int id)
+    {
+        var existing = await _context.Applications.FindAsync(id);
+        if (existing == null)
+        {
+            return DeleteResult.NotFound;
+        }
+
+        _context.Applications.Remove(existing);
+        await _context.SaveChangesAsync();
+        return DeleteResult.Deleted;
     }
 }

@@ -1,8 +1,13 @@
-﻿
+
 @model ApplicationIndexViewModel
 
 @{
     ViewData["Title"] = "Applications";
+}
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success" role="status">@successMessage</div>
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -60,6 +65,7 @@
                 <th>Status</th>
                 <th>Applied At</th>
                 <th>Notes</th>
+                    <th>Actions</th>
             </tr>
         </thead>
 
@@ -78,13 +84,17 @@
                                 : "-")
                         </td>
                         <td>@(application.Notes ?? "-")</td>
+                        <td class="text-nowrap">
+                            <a asp-action="Edit" asp-route-id="@application.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@application.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                        </td>
                     </tr>
                 }
             }
             else
             {
                 <tr>
-                    <td colspan="5" class="text-center">
+                    <td colspan="6" class="text-center">
                         No applications found.
                     </td>
                 </tr>

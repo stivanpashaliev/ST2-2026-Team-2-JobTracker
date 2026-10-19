@@ -1,10 +1,16 @@
-﻿using ST2_2026_Team_2_JobTracker.Models.Entities;
+using ST2_2026_Team_2_JobTracker.Models.Entities;
 using ST2_2026_Team_2_JobTracker.Models.Enums;
+
+using ST2_2026_Team_2_JobTracker.Services;
 
 namespace ST2_2026_Team_2_JobTracker.Services.Interfaces;
 
 public interface IJobOfferService
 {
+    Task<JobOffer?> GetByIdAsync(int id);
+    Task<bool> UpdateAsync(JobOffer jobOffer);
+    Task<DeleteResult> DeleteAsync(int id);
+
 Task CreateAsync(JobOffer jobOffer);
     Task<List<JobOffer>> GetAllAsync();
     Task<bool> ExistsAsync(int id);

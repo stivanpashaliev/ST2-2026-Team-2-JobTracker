@@ -1,6 +1,9 @@
-﻿namespace ST2_2026_Team_2_JobTracker.Controllers
+namespace ST2_2026_Team_2_JobTracker.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
+    using ST2_2026_Team_2_JobTracker.Services;
+    using ST2_2026_Team_2_JobTracker.Models.ViewModels;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using ST2_2026_Team_2_JobTracker.DesignPatterns.Singleton;
     using ST2_2026_Team_2_JobTracker.Models.Entities;
@@ -148,5 +151,142 @@ public async Task<IActionResult> Index(
 
     return View(model);
       }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var existing = await _jobOfferService.GetByIdAsync(id);
+            if (existing == null)
+            {
+                return NotFound();
+            }
+
+            var model = new JobOfferEditViewModel
+            {
+                Id = existing.Id,
+                CompanyId = existing.CompanyId,
+                Title = existing.Title,
+                Description = existing.Description,
+                Location = existing.Location,
+                Salary = existing.Salary,
+                RemoteType = existing.RemoteType,
+            };
+            await LoadCompaniesAsync(model);
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit([FromRoute] int id, JobOfferEditViewModel model)
+        {
+            if (id != model.Id)
+            {
+                return BadRequest();
+            }
+
+            var existing = await _jobOfferService.GetByIdAsync(id);
+            if (existing == null)
+            {
+                return NotFound();
+            }
+
+            if (!await _companyService.ExistsAsync(model.CompanyId))
+            {
+                ModelState.AddModelError(nameof(model.CompanyId), "The selected company does not exist.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                await LoadCompaniesAsync(model);
+                return View(model);
+            }
+
+            existing.CompanyId = model.CompanyId;
+            existing.Title = model.Title.Trim();
+            existing.Description = model.Description.Trim();
+            existing.Location = model.Location?.Trim();
+            existing.Salary = model.Salary;
+            existing.RemoteType = model.RemoteType;
+
+            try
+            {
+                if (!await _jobOfferService.UpdateAsync(existing))
+                {
+                    return NotFound();
+                }
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (await _jobOfferService.GetByIdAsync(id) == null)
+                {
+                    return NotFound();
+                }
+
+                ModelState.AddModelError(string.Empty, "This record changed while you were editing it. Reload the page and try again.");
+                await LoadCompaniesAsync(model);
+                return View(model);
+            }
+            catch (DbUpdateException)
+            {
+                ModelState.AddModelError(string.Empty, "Unable to save changes. A linked record may have changed. Reload the page and try again.");
+                await LoadCompaniesAsync(model);
+                return View(model);
+            }
+
+            TempData["SuccessMessage"] = "Job offer updated successfully.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var existing = await _jobOfferService.GetByIdAsync(id);
+            if (existing == null)
+            {
+                return NotFound();
+            }
+
+            return View(new DeleteViewModel
+            {
+                Id = id,
+                EntityName = "Job offer",
+                DisplayName = existing.Title,
+                BlockingMessage = await _jobOfferService.HasApplicationAsync(id)
+                    ? "Delete this job offer's application before deleting the job offer."
+                    : null
+            });
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed([FromRoute] int id)
+        {
+            try
+            {
+                var result = await _jobOfferService.DeleteAsync(id);
+                if (result == DeleteResult.NotFound)
+                {
+                    return NotFound();
+                }
+
+                if (result == DeleteResult.HasDependencies)
+                {
+                    return await Delete(id);
+                }
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return NotFound();
+            }
+            catch (DbUpdateException)
+            {
+                ModelState.AddModelError(string.Empty, "Unable to delete this record. It may still be linked to another record. Reload the page and try again.");
+                return await Delete(id);
+            }
+
+            TempData["SuccessMessage"] = "Job offer deleted successfully.";
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

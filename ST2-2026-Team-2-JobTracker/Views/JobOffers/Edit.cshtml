@@ -1,0 +1,63 @@
+@using ST2_2026_Team_2_JobTracker.Models.ViewModels.JobOffers
+@model JobOfferEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Job Offer";
+}
+
+<h2>Edit Job Offer</h2>
+
+<form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+    <input asp-for="Id" type="hidden" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="CompanyId" class="form-label">Company</label>
+        <select asp-for="CompanyId"
+                asp-items="Model.Companies"
+                class="form-select">
+            <option value="0">Select company</option>
+        </select>
+        <span asp-validation-for="CompanyId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Location" class="form-label"></label>
+        <input asp-for="Location" class="form-control" />
+        <span asp-validation-for="Location" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Salary" class="form-label"></label>
+        <input asp-for="Salary" class="form-control" />
+        <span asp-validation-for="Salary" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="RemoteType" class="form-label"></label>
+        <select asp-for="RemoteType"
+                asp-items="Html.GetEnumSelectList<ST2_2026_Team_2_JobTracker.Models.Enums.RemoteType>()"
+                class="form-select">
+        </select>
+        <span asp-validation-for="RemoteType" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Job Offer</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

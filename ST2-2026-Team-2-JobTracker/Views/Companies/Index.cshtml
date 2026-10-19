@@ -1,8 +1,13 @@
-﻿
+
 @model CompanyIndexViewModel
 
 @{
     ViewData["Title"] = "Companies";
+}
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success" role="status">@successMessage</div>
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -45,6 +50,7 @@
             <th>Name</th>
             <th>Website</th>
             <th>Location</th>
+            <th>Actions</th>
         </tr>
     </thead>
 
@@ -57,13 +63,17 @@
                     <td>@company.Name</td>
                     <td>@company.Website</td>
                     <td>@company.Location</td>
+                    <td class="text-nowrap">
+                        <a asp-action="Edit" asp-route-id="@company.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@company.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
                 </tr>
             }
         }
         else
         {
             <tr>
-                <td colspan="3" class="text-center">
+                <td colspan="4" class="text-center">
                     No companies found.
                 </td>
             </tr>
