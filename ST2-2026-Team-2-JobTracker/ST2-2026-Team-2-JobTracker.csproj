@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>ST2_2026_Team_2_JobTracker</RootNamespace>
+    <UserSecretsId>7c5bbf69-9f0b-44b1-a249-aaaebec7a14d</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

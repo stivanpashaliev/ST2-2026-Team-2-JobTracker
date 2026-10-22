@@ -25,7 +25,12 @@ public sealed class JobTrackerFactory : WebApplicationFactory<ST2_2026_Team_2_Jo
     {
         builder.UseEnvironment("Development");
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(
-            new Dictionary<string, string?> { ["ConnectionStrings:DefaultConnection"] = "Test database" }));
+            new Dictionary<string, string?>
+            {
+                ["ConnectionStrings:DefaultConnection"] = "Test database",
+                // Never use a developer's real Gemini key or send external HTTP from integration tests.
+                ["Gemini:ApiKey"] = ""
+            }));
         builder.ConfigureServices(services =>
         {
             services.RemoveAll<DbContextOptions<ApplicationDbContext>>();
