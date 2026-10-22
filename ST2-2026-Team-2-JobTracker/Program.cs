@@ -24,6 +24,7 @@ namespace ST2_2026_Team_2_JobTracker
             builder.Services.AddScoped<ICompanyService, CompanyService>();
             builder.Services.AddScoped<IJobOfferService, JobOfferService>();
             builder.Services.AddScoped<IApplicationService, ApplicationService>();
+            builder.Services.AddScoped<IDashboardService, DashboardService>();
             builder.Services.AddSingleton(ApplicationSettings.Instance);
 
             var app = builder.Build();

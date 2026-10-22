@@ -1,0 +1,90 @@
+/* Scoped Dashboard styles; other pages continue using site.css. */
+.dashboard-page {
+    --dashboard-ink: #182d43;
+    --dashboard-muted: #617184;
+    --dashboard-border: #e3eaf0;
+    --dashboard-link: #26746e;
+}
+
+.dashboard-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.25rem;
+    padding: clamp(1.5rem, 4vw, 2.3rem);
+    border-radius: 1.1rem;
+    background: linear-gradient(115deg, #142b4a, #21526c 68%, #28746d);
+    color: white;
+}
+
+.dashboard-hero p:last-child { color: rgba(255, 255, 255, 0.82); }
+
+.dashboard-eyebrow {
+    color: #277b70;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+}
+
+.dashboard-hero .dashboard-eyebrow { color: #8ddccf; }
+
+.dashboard-stat-card,
+.dashboard-panel {
+    padding: 1.3rem;
+    border: 1px solid var(--dashboard-border);
+    border-radius: .9rem;
+    background: white;
+    box-shadow: 0 .25rem 1rem rgba(24, 45, 67, .035);
+}
+
+.dashboard-stat-label {
+    margin-bottom: .45rem;
+    color: var(--dashboard-muted);
+    font-size: .88rem;
+}
+
+.dashboard-stat-number {
+    margin-bottom: .7rem;
+    color: var(--dashboard-ink);
+    font-size: clamp(1.9rem, 4vw, 2.5rem);
+    font-weight: 750;
+    line-height: 1.15;
+}
+
+.dashboard-stat-card a,
+.dashboard-all-link {
+    color: var(--dashboard-link);
+    font-size: .9rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.dashboard-stat-card a:hover,
+.dashboard-all-link:hover { text-decoration: underline; }
+
+.dashboard-panel-header { margin-bottom: 1.3rem; }
+.dashboard-panel-header h2 { color: var(--dashboard-ink); }
+.dashboard-status-row { margin-bottom: 1.1rem; }
+.dashboard-status-row:last-child { margin-bottom: 0; }
+.dashboard-progress { height: .55rem; background: #edf1f4; }
+.dashboard-panel .table { font-size: .9rem; }
+.dashboard-panel .table th { color: var(--dashboard-muted); font-size: .8rem; font-weight: 600; }
+.dashboard-panel .table td { padding-block: .75rem; }
+.dashboard-empty-state { padding: 1.5rem .2rem; color: var(--dashboard-muted); }
+
+.dashboard-shortcuts {
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+    flex-wrap: wrap;
+    padding: 1.1rem 1.3rem;
+    border: 1px solid var(--dashboard-border);
+    border-radius: .9rem;
+}
+
+.dashboard-shortcuts > span { margin-right: .3rem; color: var(--dashboard-ink); }
+
+@media (max-width: 767.98px) {
+    .dashboard-hero { flex-direction: column; align-items: flex-start; }
+    .dashboard-stat-card, .dashboard-panel { padding: 1rem; }
+}

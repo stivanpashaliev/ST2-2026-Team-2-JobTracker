@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ST2_2026_Team_2_JobTracker.styles.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
 
@@ -71,8 +72,15 @@
                             </a>
                         </li>
 
-                        @* Dashboard and AI Match navigation will be enabled
-                           when their controllers and views are implemented. *@
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-controller="Dashboard"
+                               asp-action="Index">
+                                Dashboard
+                            </a>
+                        </li>
+
+                        @* AI Match navigation will be enabled when that feature is implemented. *@
 
                     </ul>
                 </div>

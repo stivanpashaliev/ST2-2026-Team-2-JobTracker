@@ -1,0 +1,163 @@
+@model ST2_2026_Team_2_JobTracker.Models.ViewModels.Dashboard.DashboardViewModel
+@using ST2_2026_Team_2_JobTracker.Models.Enums
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+}
+
+<div class="dashboard-page">
+    <section class="dashboard-hero mb-4" aria-labelledby="dashboard-heading">
+        <div>
+            <p class="dashboard-eyebrow mb-2">JOB SEARCH OVERVIEW</p>
+            <h1 id="dashboard-heading" class="h2 mb-2">Your dashboard</h1>
+            <p class="mb-0">Keep track of your opportunities and see where each application stands.</p>
+        </div>
+        <a asp-controller="JobOffers" asp-action="Create" class="btn btn-light fw-semibold">+ Add job offer</a>
+    </section>
+
+    <section aria-label="Job search statistics" class="mb-4">
+        <div class="row g-3">
+            <div class="col-6 col-lg-3">
+                <div class="dashboard-stat-card h-100">
+                    <p class="dashboard-stat-label">Companies</p>
+                    <div class="dashboard-stat-number">@Model.TotalCompanies</div>
+                    <a asp-controller="Companies" asp-action="Index">View companies <span aria-hidden="true">&rarr;</span></a>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="dashboard-stat-card h-100">
+                    <p class="dashboard-stat-label">Job offers</p>
+                    <div class="dashboard-stat-number">@Model.TotalJobOffers</div>
+                    <a asp-controller="JobOffers" asp-action="Index">View offers <span aria-hidden="true">&rarr;</span></a>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="dashboard-stat-card h-100">
+                    <p class="dashboard-stat-label">Applications</p>
+                    <div class="dashboard-stat-number">@Model.TotalApplications</div>
+                    <a asp-controller="Applications" asp-action="Index">View applications <span aria-hidden="true">&rarr;</span></a>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="dashboard-stat-card h-100">
+                    <p class="dashboard-stat-label">Offers without application</p>
+                    <div class="dashboard-stat-number">@Model.AvailableJobOffers</div>
+                    <a asp-controller="Applications" asp-action="Create">Track an application <span aria-hidden="true">&rarr;</span></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="row g-4">
+        <section class="col-lg-5" aria-labelledby="statuses-heading">
+            <div class="dashboard-panel h-100">
+                <div class="dashboard-panel-header">
+                    <div>
+                        <p class="dashboard-eyebrow mb-1">THE PIPELINE</p>
+                        <h2 id="statuses-heading" class="h5 mb-0">Application statuses</h2>
+                    </div>
+                </div>
+                @if (Model.TotalApplications == 0)
+                {
+                    <p class="text-muted small mb-4">No applications yet. Status totals will appear here once you add one.</p>
+                }
+                @foreach (var status in Model.ApplicationStatuses)
+                {
+                    var percent = Model.TotalApplications == 0
+                        ? 0
+                        : (int)Math.Round(status.Count * 100.0 / Model.TotalApplications);
+                    var colorClass = status.Status switch
+                    {
+                        ApplicationStatus.Interview => "bg-info",
+                        ApplicationStatus.Offer => "bg-success",
+                        ApplicationStatus.Rejected => "bg-danger",
+                        ApplicationStatus.Applied => "bg-primary",
+                        _ => "bg-secondary"
+                    };
+                    <div class="dashboard-status-row">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-medium">@status.Status</span>
+                            <span class="text-muted">@status.Count <span class="small">(@percent%)</span></span>
+                        </div>
+                        <div class="progress dashboard-progress" role="progressbar"
+                             aria-label="@status.Status applications" aria-valuenow="@percent"
+                             aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar @colorClass" style="width: @(percent)%"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <section class="col-lg-7" aria-labelledby="recent-heading">
+            <div class="dashboard-panel h-100">
+                <div class="dashboard-panel-header d-flex justify-content-between align-items-center gap-2">
+                    <div>
+                        <p class="dashboard-eyebrow mb-1">MOST RECENTLY ADDED</p>
+                        <h2 id="recent-heading" class="h5 mb-0">Latest applications</h2>
+                    </div>
+                    <a asp-controller="Applications" asp-action="Index" class="dashboard-all-link">View all</a>
+                </div>
+                @if (Model.RecentApplications.Count == 0)
+                {
+                    <div class="dashboard-empty-state">
+                        <p class="mb-2">You haven't tracked any applications yet.</p>
+                        <a asp-controller="Applications" asp-action="Create" class="btn btn-primary btn-sm">Add your first application</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Position / Company</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Applied</th>
+                                    <th scope="col" class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var application in Model.RecentApplications)
+                                {
+                                    var badgeClass = application.Status switch
+                                    {
+                                        ApplicationStatus.Interview => "text-bg-info",
+                                        ApplicationStatus.Offer => "text-bg-success",
+                                        ApplicationStatus.Rejected => "text-bg-danger",
+                                        ApplicationStatus.Applied => "text-bg-primary",
+                                        _ => "text-bg-secondary"
+                                    };
+                                    <tr>
+                                        <td>
+                                            <span class="fw-semibold d-block">@application.JobTitle</span>
+                                            <span class="text-muted small">@application.CompanyName</span>
+                                        </td>
+                                        <td><span class="badge @badgeClass">@application.Status</span></td>
+                                        <td class="text-nowrap">@(application.AppliedAt?.ToString("dd.MM.yyyy") ?? "—")</td>
+                                        <td class="text-end">
+                                            <a asp-controller="Applications" asp-action="Edit"
+                                               asp-route-id="@application.Id" class="btn btn-sm btn-outline-primary"
+                                               aria-label="Edit application for @application.JobTitle">Edit</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </section>
+    </div>
+
+    <section class="dashboard-shortcuts mt-4" aria-label="Quick actions">
+        <span class="fw-semibold">Quick actions</span>
+        <a asp-controller="Companies" asp-action="Create" class="btn btn-outline-primary btn-sm">+ Company</a>
+        <a asp-controller="JobOffers" asp-action="Create" class="btn btn-outline-primary btn-sm">+ Job offer</a>
+        <a asp-controller="Applications" asp-action="Create" class="btn btn-outline-primary btn-sm">+ Application</a>
+    </section>
+</div>
