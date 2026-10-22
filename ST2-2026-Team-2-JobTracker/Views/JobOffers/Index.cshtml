@@ -19,6 +19,7 @@
 </div>
 
 <form asp-action="Index" method="get" class="row g-3 mb-4">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="col-md-3">
         <label asp-for="Title" class="form-label">Job Title</label>
@@ -34,6 +35,7 @@
                 class="form-select">
             <option value="">All Companies</option>
         </select>
+        <span asp-validation-for="CompanyId" class="text-danger"></span>
     </div>
 
     <div class="col-md-3">
@@ -50,6 +52,7 @@
                 class="form-select">
             <option value="">All Types</option>
         </select>
+        <span asp-validation-for="RemoteType" class="text-danger"></span>
     </div>
 
 <div class="col-md-3">
@@ -62,6 +65,7 @@
            step="0.01"
            class="form-control"
            placeholder="Min salary" />
+    <span asp-validation-for="MinSalary" class="text-danger"></span>
 </div>
 
 <div class="col-md-3">
@@ -74,6 +78,7 @@
            step="0.01"
            class="form-control"
            placeholder="Max salary" />
+    <span asp-validation-for="MaxSalary" class="text-danger"></span>
 </div>
 
     <div class="col-12 d-flex gap-2">
@@ -128,7 +133,7 @@
             {
                 <tr>
                     <td colspan="7" class="text-center">
-                        No job offers found.
+                        @(ViewData.ModelState.IsValid ? "No job offers found." : "Correct the filters above and search again.")
                     </td>
                 </tr>
             }

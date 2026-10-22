@@ -1,6 +1,5 @@
 using ST2_2026_Team_2_JobTracker.Models.Entities;
-
-using ST2_2026_Team_2_JobTracker.Services;
+using ST2_2026_Team_2_JobTracker.Models.Enums;
 
 namespace ST2_2026_Team_2_JobTracker.Services.Interfaces;
 

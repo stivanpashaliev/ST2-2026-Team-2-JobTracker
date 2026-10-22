@@ -1,13 +1,14 @@
 namespace ST2_2026_Team_2_JobTracker.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
-    using ST2_2026_Team_2_JobTracker.Services;
     using Microsoft.EntityFrameworkCore;
     using ST2_2026_Team_2_JobTracker.DesignPatterns.Singleton;
     using ST2_2026_Team_2_JobTracker.Models.Entities;
     using ST2_2026_Team_2_JobTracker.Models.ViewModels;
     using ST2_2026_Team_2_JobTracker.Models.ViewModels.Companies;
     using ST2_2026_Team_2_JobTracker.Services.Interfaces;
+    using ST2_2026_Team_2_JobTracker.Models.Enums;
+
     public class CompaniesController : Controller
     {
         private readonly ICompanyService _companyService;
@@ -40,16 +41,25 @@ namespace ST2_2026_Team_2_JobTracker.Controllers
 
             var company = new Company
             {
-                Name = model.Name.Trim(),
-                Website = model.Website?.Trim(),
-                Location = model.Location?.Trim()
+                Name = model.Name,
+                Website = model.Website,
+                Location = model.Location
             };
 
-            await _companyService.CreateAsync(company);
+            try
+            {
+                await _companyService.CreateAsync(company);
+            }
+            catch (DbUpdateException)
+            {
+                ModelState.AddModelError(string.Empty,
+                    "Unable to create the company. Please try again.");
+                return View(model);
+            }
 
             TempData["SuccessMessage"] = "Company created successfully.";
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(nameof(Index));
         }
 
 
@@ -74,17 +84,7 @@ namespace ST2_2026_Team_2_JobTracker.Controllers
             int totalPages = (int)Math.Ceiling(
                 (double)totalCount / pageSize);
 
-            if (totalPages > 0 && page > totalPages)
-            {
-                page = totalPages;
-
-                (companies, totalCount) =
-                    await _companyService.GetFilteredAsync(
-                        name,
-                        location,
-                        page,
-                        pageSize);
-            }
+            page = totalPages > 0 ? Math.Min(page, totalPages) : 1;
 
             var model = new CompanyIndexViewModel
             {
@@ -142,9 +142,9 @@ namespace ST2_2026_Team_2_JobTracker.Controllers
                 return View(model);
             }
 
-            existing.Name = model.Name.Trim();
-            existing.Website = model.Website?.Trim();
-            existing.Location = model.Location?.Trim();
+            existing.Name = model.Name;
+            existing.Website = model.Website;
+            existing.Location = model.Location;
 
             try
             {

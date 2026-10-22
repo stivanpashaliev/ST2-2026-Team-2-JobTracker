@@ -56,6 +56,10 @@ public class ApplicationService : IApplicationService
 
         var totalCount = await query.CountAsync();
 
+        // Clamp before Skip: (int.MaxValue - 1) * pageSize can overflow int.
+        var lastPage = Math.Max(1, (int)Math.Ceiling((double)totalCount / pageSize));
+        page = Math.Clamp(page, 1, lastPage);
+
         var items = await query
             .OrderByDescending(a => a.AppliedAt)
             .ThenBy(a => a.Id)

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ST2_2026_Team_2_JobTracker.Common.Constants;
+using ST2_2026_Team_2_JobTracker.Common.Helpers;
 using ST2_2026_Team_2_JobTracker.Models.Enums;
 
 namespace ST2_2026_Team_2_JobTracker.Models.ViewModels.Applications;
@@ -8,6 +9,8 @@ namespace ST2_2026_Team_2_JobTracker.Models.ViewModels.Applications;
 
 public class ApplicationCreateViewModel
 {
+    private string? _notes;
+
     [Range(1, int.MaxValue,
         ErrorMessage = "Please select a job offer.")]
     public int JobOfferId { get; set; }
@@ -25,7 +28,11 @@ public class ApplicationCreateViewModel
     [StringLength(
         ValidationConstants.Application.NotesMaxLength,
         ErrorMessage = "Notes cannot exceed {1} characters.")]
-    public string? Notes { get; set; }
+    public string? Notes
+    {
+        get => _notes;
+        set => _notes = TextNormalization.Optional(value);
+    }
 
     public IEnumerable<SelectListItem> JobOffers { get; set; }
         = new List<SelectListItem>();

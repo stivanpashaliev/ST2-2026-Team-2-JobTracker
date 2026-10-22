@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using ST2_2026_Team_2_JobTracker.Data;
 using ST2_2026_Team_2_JobTracker.Models.Entities;
+using ST2_2026_Team_2_JobTracker.Models.Enums;
 using ST2_2026_Team_2_JobTracker.Services.Interfaces;
 
 namespace ST2_2026_Team_2_JobTracker.Services;
@@ -60,6 +61,10 @@ public class CompanyService : ICompanyService
         }
 
         var totalCount = await query.CountAsync();
+
+        // Clamp before Skip: (int.MaxValue - 1) * pageSize can overflow int.
+        var lastPage = Math.Max(1, (int)Math.Ceiling((double)totalCount / pageSize));
+        page = Math.Clamp(page, 1, lastPage);
 
         var items = await query
             .OrderBy(c => c.Name)

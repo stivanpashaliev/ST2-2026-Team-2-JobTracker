@@ -1,8 +1,6 @@
 using ST2_2026_Team_2_JobTracker.Models.Entities;
 using ST2_2026_Team_2_JobTracker.Models.Enums;
 
-using ST2_2026_Team_2_JobTracker.Services;
-
 namespace ST2_2026_Team_2_JobTracker.Services.Interfaces;
 
 public interface IApplicationService

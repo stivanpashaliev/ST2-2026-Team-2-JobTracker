@@ -42,6 +42,19 @@ public class JobOfferService : IJobOfferService
             .AnyAsync(a => a.JobOfferId == id);
     }
 
+    // Single correlated NOT EXISTS query, instead of one query per offer (N+1).
+    // On Edit, keep the offer currently assigned to this application selectable.
+    public Task<List<JobOffer>> GetAvailableForApplicationAsync(int? currentJobOfferId = null)
+    {
+        return _context.JobOffers
+            .AsNoTracking()
+            .Where(j => j.Id == currentJobOfferId ||
+                !_context.Applications.Any(a => a.JobOfferId == j.Id))
+            .OrderBy(j => j.Title)
+            .ThenBy(j => j.Id)
+            .ToListAsync();
+    }
+
     public async Task<(List<JobOffer> Items, int TotalCount)> GetFilteredAsync(
         string? title,
         int? companyId,
@@ -98,6 +111,10 @@ public class JobOfferService : IJobOfferService
         }
 
         var totalCount = await query.CountAsync();
+
+        // Clamp before Skip: (int.MaxValue - 1) * pageSize can overflow int.
+        var lastPage = Math.Max(1, (int)Math.Ceiling((double)totalCount / pageSize));
+        page = Math.Clamp(page, 1, lastPage);
 
         var items = await query
             .OrderByDescending(j => j.CreatedAt)

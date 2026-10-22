@@ -8,7 +8,6 @@ namespace ST2_2026_Team_2_JobTracker.Controllers
     using ST2_2026_Team_2_JobTracker.Models.Entities;
     using ST2_2026_Team_2_JobTracker.Models.Enums;
     using ST2_2026_Team_2_JobTracker.Models.ViewModels.Applications;
-    using ST2_2026_Team_2_JobTracker.Services;
     using ST2_2026_Team_2_JobTracker.Services.Interfaces;
 
     public class ApplicationsController : Controller
@@ -76,38 +75,54 @@ namespace ST2_2026_Team_2_JobTracker.Controllers
             {
                 JobOfferId = model.JobOfferId,
                 Status = model.Status,
+                // An explicitly selected date represents UTC midnight; when no date
+                // is supplied, record the actual time of application.
                 AppliedAt = model.Status == ApplicationStatus.Saved
                     ? null
-                    : model.AppliedAt ?? DateTime.UtcNow,
-                Notes = model.Notes?.Trim()
+                    : model.AppliedAt.HasValue
+                        ? DateTime.SpecifyKind(model.AppliedAt.Value.Date, DateTimeKind.Utc)
+                        : DateTime.UtcNow,
+                Notes = model.Notes
             };
 
-            await _applicationService.CreateAsync(application);
+            try
+            {
+                await _applicationService.CreateAsync(application);
+            }
+            catch (DbUpdateException)
+            {
+                // Checking before SaveChanges is not atomic. A second request can
+                // create an application for this offer between the check and insert.
+                if (await _jobOfferService.HasApplicationAsync(model.JobOfferId))
+                {
+                    ModelState.AddModelError(nameof(model.JobOfferId),
+                        "This job offer already has an application.");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty,
+                        "Unable to create the application. The job offer may have been removed.");
+                }
+
+                await LoadJobOffersAsync(model);
+                return View(model);
+            }
 
             TempData["SuccessMessage"] = "Application created successfully.";
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(nameof(Index));
         }
 
         private async Task LoadJobOffersAsync(ApplicationCreateViewModel model, int? currentJobOfferId = null)
         {
-            var jobOffers = await _jobOfferService.GetAllAsync();
+            var jobOffers = await _jobOfferService
+                .GetAvailableForApplicationAsync(currentJobOfferId);
 
-            var availableOffers = new List<SelectListItem>();
-
-            foreach (var jobOffer in jobOffers)
+            model.JobOffers = jobOffers.Select(j => new SelectListItem
             {
-                if (jobOffer.Id == currentJobOfferId || !await _jobOfferService.HasApplicationAsync(jobOffer.Id))
-                {
-                    availableOffers.Add(new SelectListItem
-                    {
-                        Value = jobOffer.Id.ToString(),
-                        Text = jobOffer.Title
-                    });
-                }
-            }
-
-            model.JobOffers = availableOffers;
+                Value = j.Id.ToString(),
+                Text = j.Title
+            }).ToList();
         }
 
 
@@ -123,29 +138,26 @@ namespace ST2_2026_Team_2_JobTracker.Controllers
 
             int pageSize = _settings.DefaultPageSize;
 
-            var (applications, totalCount) =
-                await _applicationService.GetFilteredAsync(
-                    jobTitle,
-                    companyId,
-                    status,
-                    page,
-                    pageSize);
+            if (companyId is <= 0)
+            {
+                ModelState.AddModelError(nameof(ApplicationIndexViewModel.CompanyId),
+                    "Please select a valid company.");
+            }
+            if (status.HasValue && !Enum.IsDefined(status.Value))
+            {
+                ModelState.AddModelError(nameof(ApplicationIndexViewModel.Status),
+                    "Please select a valid status.");
+            }
+
+            var (applications, totalCount) = ModelState.IsValid
+                ? await _applicationService.GetFilteredAsync(
+                    jobTitle, companyId, status, page, pageSize)
+                : (new List<Application>(), 0);
 
             int totalPages = (int)Math.Ceiling(
                 (double)totalCount / pageSize);
 
-            if (totalPages > 0 && page > totalPages)
-            {
-                page = totalPages;
-
-                (applications, totalCount) =
-                    await _applicationService.GetFilteredAsync(
-                        jobTitle,
-                        companyId,
-                        status,
-                        page,
-                        pageSize);
-            }
+            page = totalPages > 0 ? Math.Min(page, totalPages) : 1;
 
             var companies = await _companyService.GetAllAsync();
 
@@ -230,8 +242,17 @@ namespace ST2_2026_Team_2_JobTracker.Controllers
             var currentJobOfferId = existing.JobOfferId;
             existing.JobOfferId = model.JobOfferId;
             existing.Status = model.Status;
-            existing.AppliedAt = model.Status == ApplicationStatus.Saved ? null : model.AppliedAt ?? existing.AppliedAt ?? DateTime.UtcNow;
-            existing.Notes = model.Notes?.Trim();
+            // HTML date inputs omit the time. Editing only the notes/status must
+            // not silently reset the time of an existing application.
+            existing.AppliedAt = model.Status == ApplicationStatus.Saved
+                ? null
+                : model.AppliedAt.HasValue
+                    ? existing.AppliedAt.HasValue &&
+                      existing.AppliedAt.Value.Date == model.AppliedAt.Value.Date
+                        ? existing.AppliedAt
+                        : DateTime.SpecifyKind(model.AppliedAt.Value.Date, DateTimeKind.Utc)
+                    : existing.AppliedAt ?? DateTime.UtcNow;
+            existing.Notes = model.Notes;
 
             try
             {
@@ -253,7 +274,18 @@ namespace ST2_2026_Team_2_JobTracker.Controllers
             }
             catch (DbUpdateException)
             {
-                ModelState.AddModelError(string.Empty, "Unable to save changes. A linked record may have changed. Reload the page and try again.");
+                if (await _jobOfferService.HasApplicationAsync(model.JobOfferId) &&
+                    model.JobOfferId != currentJobOfferId)
+                {
+                    ModelState.AddModelError(nameof(model.JobOfferId),
+                        "This job offer already has an application.");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty,
+                        "Unable to save changes. A linked record may have changed. Reload the page and try again.");
+                }
+
                 await LoadJobOffersAsync(model, currentJobOfferId);
                 return View(model);
             }

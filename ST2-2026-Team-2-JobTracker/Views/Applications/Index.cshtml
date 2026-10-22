@@ -19,6 +19,7 @@
 </div>
 
 <form asp-action="Index" method="get" class="row g-3 mb-4">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="col-md-4">
         <label asp-for="JobTitle" class="form-label">Job Title</label>
@@ -34,6 +35,7 @@
                 class="form-select">
             <option value="">All Companies</option>
         </select>
+        <span asp-validation-for="CompanyId" class="text-danger"></span>
     </div>
 
     <div class="col-md-4">
@@ -43,6 +45,7 @@
                 class="form-select">
             <option value="">All Statuses</option>
         </select>
+        <span asp-validation-for="Status" class="text-danger"></span>
     </div>
 
     <div class="col-12 d-flex gap-2">
@@ -95,7 +98,7 @@
             {
                 <tr>
                     <td colspan="6" class="text-center">
-                        No applications found.
+                        @(ViewData.ModelState.IsValid ? "No applications found." : "Correct the filters above and search again.")
                     </td>
                 </tr>
             }

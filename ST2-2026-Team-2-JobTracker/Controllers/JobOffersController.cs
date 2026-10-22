@@ -1,7 +1,6 @@
 namespace ST2_2026_Team_2_JobTracker.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
-    using ST2_2026_Team_2_JobTracker.Services;
     using ST2_2026_Team_2_JobTracker.Models.ViewModels;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.AspNetCore.Mvc.Rendering;
@@ -55,19 +54,29 @@ namespace ST2_2026_Team_2_JobTracker.Controllers
             var jobOffer = new JobOffer
             {
                 CompanyId = model.CompanyId,
-                Title = model.Title.Trim(),
-                Description = model.Description.Trim(),
-                Location = model.Location?.Trim(),
+                Title = model.Title,
+                Description = model.Description,
+                Location = model.Location,
                 Salary = model.Salary,
                 RemoteType = model.RemoteType,
                 CreatedAt = DateTime.UtcNow
             };
 
-            await _jobOfferService.CreateAsync(jobOffer);
+            try
+            {
+                await _jobOfferService.CreateAsync(jobOffer);
+            }
+            catch (DbUpdateException)
+            {
+                ModelState.AddModelError(string.Empty,
+                    "Unable to create the job offer. The selected company may have been removed.");
+                await LoadCompaniesAsync(model);
+                return View(model);
+            }
 
             TempData["SuccessMessage"] = "Job offer created successfully.";
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(nameof(Index));
         }
 
         private async Task LoadCompaniesAsync(JobOfferCreateViewModel model)
@@ -97,35 +106,44 @@ public async Task<IActionResult> Index(
 
     int pageSize = _settings.DefaultPageSize;
 
-    var (jobOffers, totalCount) =
-        await _jobOfferService.GetFilteredAsync(
-            title,
-            companyId,
-            location,
-            remoteType,
-            minSalary,
-            maxSalary,
-            page,
-            pageSize);
+    if (companyId is <= 0)
+    {
+        ModelState.AddModelError(nameof(JobOfferIndexViewModel.CompanyId),
+            "Please select a valid company.");
+    }
+    if (remoteType.HasValue && !Enum.IsDefined(remoteType.Value))
+    {
+        ModelState.AddModelError(nameof(JobOfferIndexViewModel.RemoteType),
+            "Please select a valid work type.");
+    }
+    if (minSalary < 0)
+    {
+        ModelState.AddModelError(nameof(JobOfferIndexViewModel.MinSalary),
+            "Minimum salary cannot be negative.");
+    }
+    if (maxSalary < 0)
+    {
+        ModelState.AddModelError(nameof(JobOfferIndexViewModel.MaxSalary),
+            "Maximum salary cannot be negative.");
+    }
+    if (minSalary.HasValue && maxSalary.HasValue && minSalary > maxSalary)
+    {
+        ModelState.AddModelError(nameof(JobOfferIndexViewModel.MaxSalary),
+            "Maximum salary must be greater than or equal to minimum salary.");
+    }
+
+    // Also respects MVC model-binding errors (e.g. minSalary=not-a-number).
+    // Invalid filters must not execute misleading database queries.
+    var (jobOffers, totalCount) = ModelState.IsValid
+        ? await _jobOfferService.GetFilteredAsync(
+            title, companyId, location, remoteType, minSalary, maxSalary,
+            page, pageSize)
+        : (new List<JobOffer>(), 0);
 
     int totalPages = (int)Math.Ceiling(
         (double)totalCount / pageSize);
 
-    if (totalPages > 0 && page > totalPages)
-    {
-        page = totalPages;
-
-        (jobOffers, totalCount) =
-            await _jobOfferService.GetFilteredAsync(
-                title,
-                companyId,
-                location,
-                remoteType,
-                minSalary,
-                maxSalary,
-                page,
-                pageSize);
-    }
+    page = totalPages > 0 ? Math.Min(page, totalPages) : 1;
 
     var companies = await _companyService.GetAllAsync();
 
@@ -203,9 +221,9 @@ public async Task<IActionResult> Index(
             }
 
             existing.CompanyId = model.CompanyId;
-            existing.Title = model.Title.Trim();
-            existing.Description = model.Description.Trim();
-            existing.Location = model.Location?.Trim();
+            existing.Title = model.Title;
+            existing.Description = model.Description;
+            existing.Location = model.Location;
             existing.Salary = model.Salary;
             existing.RemoteType = model.RemoteType;
 
